@@ -1,15 +1,14 @@
-import os  # ⬅️ BU QATORNI QO'SHING!
+import os
 
-# Bot sozlamalari shu yerda saqlanadi
-# @BotFather dan olingan bot tokeningizni shu yerga qo'ying
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+# Bot tokenini Render'ning "Environment" bo'limida BOT_TOKEN nomi bilan kiriting.
+# Hech qachon tokenni to'g'ridan-to'g'ri kodga yozib qo'ymang.
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
-# Admin(Lar)ning Telegram user ID raqamlari (bir nechta bo'lishi mumkin)
-# O'z ID raqamingizni bilish uchun @userinfobot ga /start yozing
-ADMIN_IDS = [6756923304]  # shu yerga o'z ID raqamingizni yozing
+# Admin(lar)ning Telegram user_id larini shu yerga yozing (bir nechta bo'lishi mumkin)
+ADMIN_IDS = [
+    int(x) for x in os.environ.get("ADMIN_IDS", "").split(",") if x.strip()
+]
 
-# Kinolar joylashgan SHAXSIY KANALINGIZNING ID raqami.
-# Bot shu kanalga admin qilish qo'shilgan bo'lishi SHART (post ko'rish huquqi bilan).
-PERSONAL_CHANNEL_ID = -1003721029830  # shu yerga o'z kanalingiz ID sini yozing
-
-DB_NAME = "movies.db"
+# Render'dagi xizmatingizning asosiy URL manzili (webhook uchun kerak)
+# Masalan: https://filmbott-uvy4.onrender.com
+BASE_URL = os.environ.get("BASE_URL", "https://filmbott-uvy4.onrender.com")

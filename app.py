@@ -1,10 +1,8 @@
 import os
-import logging
-from flask import Flask
-from telegram import Update, Bot
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-import asyncio
 import threading
+from flask import Flask
+import telebot  # ⬅️ BU: telebot (pyTelegramBotAPI)
+from config import BOT_TOKEN, ADMIN_IDS, PERSONAL_CHANNEL_ID, DB_NAME
 
 # Flask ilovasi
 app = Flask(__name__)
@@ -17,25 +15,21 @@ def home():
 def health():
     return "OK", 200
 
-# ============ BOT KODINGIZNI SHU YERGA QO'YING ============
-# Sizning barcha bot funksiyalaringiz (start, help, kinolar va h.k.)
+# Bot obyekti
+bot = telebot.TeleBot(BOT_TOKEN)
+
+# ============ BOT FUNKSIYALARI ============
+# Sizning barcha @bot.message_handler() funksiyalaringiz shu yerga
+
 # Masalan:
-# async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     await update.message.reply_text("Salom! Men kino botman!")
+# @bot.message_handler(commands=['start'])
+# def start(message):
+#     bot.reply_to(message, "Salom! Men kino botman!")
 
 def run_bot():
-    """Botni alohida threadda ishga tushiradi"""
-    from config import BOT_TOKEN, ADMIN_IDS, PERSONAL_CHANNEL_ID, DB_NAME
-    
-    # Botni sozlash
-    application = Application.builder().token(BOT_TOKEN).build()
-    
-    # Handlerlarni qo'shing (o'z kodlaringizni shu yerga yozing)
-    # application.add_handler(CommandHandler("start", start))
-    # application.add_handler(...)
-    
-    # Botni ishga tushirish
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    """Botni ishga tushiradi"""
+    print("Bot ishga tushmoqda...")
+    bot.infinity_polling(skip_pending=True)
 
 if __name__ == '__main__':
     # Botni alohida threadda ishga tushirish
@@ -45,4 +39,5 @@ if __name__ == '__main__':
     
     # Flask serverni ishga tushirish
     port = int(os.environ.get('PORT', 5000))
+    print(f"Flask server {port} portda ishga tushmoqda...")
     app.run(host='0.0.0.0', port=port, debug=False)

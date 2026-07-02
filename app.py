@@ -1,10 +1,9 @@
 import os
 import threading
 from flask import Flask
-import telebot  # ⬅️ BU: telebot (pyTelegramBotAPI)
+import telebot
 from config import BOT_TOKEN, ADMIN_IDS, PERSONAL_CHANNEL_ID, DB_NAME
 
-# Flask ilovasi
 app = Flask(__name__)
 
 @app.route('/')
@@ -15,21 +14,28 @@ def home():
 def health():
     return "OK", 200
 
-# Bot obyekti
 bot = telebot.TeleBot(BOT_TOKEN)
 
-# ============ BOT FUNKSIYALARI ============
-# Sizning barcha @bot.message_handler() funksiyalaringiz shu yerga
+# ===== BOT FUNKSIYALARI =====
+@bot.message_handler(commands=['start'])
+def start(message):
+    bot.reply_to(message, "🎬 Salom! Men kino botman!\n\n/help - yordam olish")
 
-# Masalan:
-# @bot.message_handler(commands=['start'])
-# def start(message):
-#     bot.reply_to(message, "Salom! Men kino botman!")
+@bot.message_handler(commands=['help'])
+def help_command(message):
+    bot.reply_to(message, "📽️ Bot haqida:\n\n/start - boshlash\n/kino - kino qidirish")
+
+# Kinoni qidirish uchun funksiya
+@bot.message_handler(func=lambda message: True)
+def echo_all(message):
+    bot.reply_to(message, f"📽️ Siz {message.text} haqida so'radingiz. Tez orada kinolar chiqariladi!")
 
 def run_bot():
-    """Botni ishga tushiradi"""
     print("Bot ishga tushmoqda...")
-    bot.infinity_polling(skip_pending=True)
+    try:
+        bot.infinity_polling(skip_pending=True)
+    except Exception as e:
+        print(f"Bot xatosi: {e}")
 
 if __name__ == '__main__':
     # Botni alohida threadda ishga tushirish

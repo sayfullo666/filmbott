@@ -14,6 +14,7 @@ admin_state = {}
 
 BTN_ADD_MOVIE = "➕ Kino qo'shish"
 BTN_DEL_MOVIE = "🗑 Kino o'chirish"
+BTN_MOVIE_LIST = "🎬 Kinolar ro'yxati"
 BTN_STATS = "📊 Statistika"
 BTN_ADD_CHANNEL = "➕ Majburiy kanal qo'shish"
 BTN_DEL_CHANNEL = "➖ Majburiy kanal o'chirish"
@@ -28,6 +29,7 @@ def is_admin(user_id: int) -> bool:
 def admin_panel_markup():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add(BTN_ADD_MOVIE, BTN_DEL_MOVIE)
+    markup.add(BTN_MOVIE_LIST)
     markup.add(BTN_STATS)
     markup.add(BTN_ADD_CHANNEL, BTN_DEL_CHANNEL)
     markup.add(BTN_CHANNEL_LIST)
@@ -120,6 +122,26 @@ def admin_stats(message):
         f"📢 Majburiy kanallar soni: {len(db.get_channels())}"
     )
     bot.send_message(message.chat.id, text)
+
+
+@bot.message_handler(func=lambda m: is_admin(m.from_user.id) and m.text == BTN_MOVIE_LIST)
+def admin_movie_list(message):
+    movies = db.get_all_movies()
+    if not movies:
+        bot.send_message(message.chat.id, "Hozircha kinolar qo'shilmagan.")
+        return
+
+    header = f"🎬 Jami: {len(movies)} ta kino\n\n"
+    lines = [f"• {m['code']} — {m['title']}" for m in movies]
+
+    chunk = header
+    for line in lines:
+        if len(chunk) + len(line) + 1 > 3500:
+            bot.send_message(message.chat.id, chunk)
+            chunk = ""
+        chunk += line + "\n"
+    if chunk:
+        bot.send_message(message.chat.id, chunk)
 
 
 @bot.message_handler(func=lambda m: is_admin(m.from_user.id) and m.text == BTN_ADD_CHANNEL)

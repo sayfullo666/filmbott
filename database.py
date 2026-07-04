@@ -98,6 +98,16 @@ def movies_count() -> int:
     return count
 
 
+def get_all_movies():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM movies ORDER BY added_at DESC")
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
 # ---------------- CHANNELS ----------------
 
 def add_channel(channel_id: str, channel_title: str, channel_link: str) -> bool:
